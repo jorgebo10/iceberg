@@ -46,6 +46,7 @@ public class CommitterImpl implements Committer {
   private SinkTaskContext context;
   private KafkaClientFactory clientFactory;
   private Collection<MemberDescription> membersWhenWorkerIsCoordinator;
+  private TopicPartition leaderPartition;
   private final AtomicBoolean isInitialized = new AtomicBoolean(false);
   private String taskId;
 
@@ -84,6 +85,9 @@ public class CommitterImpl implements Committer {
     Collection<MemberDescription> members = groupDesc.members();
     if (containsFirstPartition(members, currentAssignedPartitions)) {
       membersWhenWorkerIsCoordinator = members;
+      // remember the partition leadership was won with, so close() does not have to ask the
+      // group again at a point where it cannot answer
+      leaderPartition = findFirstTopicPartition(members);
       return true;
     }
 
@@ -175,9 +179,15 @@ public class CommitterImpl implements Committer {
       return;
     }
 
-    // Normal close: if leader partition is lost, stop coordinator.
-    if (hasLeaderPartition(closedPartitions)) {
-      LOG.info("Committer {} lost leader partition. Stopping coordinator.", taskId);
+    // Normal close: if the partition leadership was won with is being revoked, stop the
+    // coordinator. Leadership is deliberately not re-derived here: close() runs during the
+    // rebalance that revokes the partitions, so a group description can report members with no
+    // assignments at all, which would leave this task's coordinator running while the next
+    // open() elects another one.
+    if (coordinatorThread != null
+        && (leaderPartition == null || closedPartitions.contains(leaderPartition))) {
+      LOG.info(
+          "Committer {} lost leader partition {}. Stopping coordinator.", taskId, leaderPartition);
       stopCoordinator();
     }
 
@@ -236,5 +246,6 @@ public class CommitterImpl implements Committer {
       coordinatorThread.terminate();
       coordinatorThread = null;
     }
+    leaderPartition = null;
   }
 }
