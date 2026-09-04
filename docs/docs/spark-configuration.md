@@ -199,7 +199,6 @@ val spark = SparkSession.builder()
 | spark.sql.iceberg.data-planning-mode                   | AUTO                                                           | Scan planning mode for data files (`AUTO`, `LOCAL`, `DISTRIBUTED`)                                                              |
 | spark.sql.iceberg.delete-planning-mode                 | AUTO                                                           | Scan planning mode for delete files (`AUTO`, `LOCAL`, `DISTRIBUTED`)                                                            |
 | spark.sql.iceberg.advisory-partition-size              | Table default                                                  | Advisory size (bytes) used for writing to the Table when Spark's Adaptive Query Execution is enabled. Used to size output files |
-| spark.sql.iceberg.read.split-size                     | Table default                                                  | Overrides `read.split.target-size` for scan planning. Session values are honored like read options and disable adaptive split-size adjustment |
 | spark.sql.iceberg.locality.enabled                     | false                                                          | Report locality information for Spark task placement on executors                                                               |
 | spark.sql.iceberg.executor-cache.enabled               | true                                                           | Enables cache for executor-side (currently used to cache Delete Files)                                                          |
 | spark.sql.iceberg.executor-cache.timeout               | 10                                                             | Timeout in minutes for executor cache entries                                                                                   |
@@ -208,8 +207,6 @@ val spark = SparkSession.builder()
 | spark.sql.iceberg.executor-cache.locality.enabled      | false                                                          | Enables locality-aware executor cache usage                                                                                     |
 | spark.sql.iceberg.merge-schema                         | false                                                          | Enables modifying the table schema to match the write schema. Only adds columns missing columns                                 |
 | spark.sql.iceberg.report-column-stats                  | true                                                           | Report Puffin Table Statistics if available to Spark's Cost Based Optimizer. CBO must be enabled for this to be effective       |
-| spark.sql.iceberg.read.adaptive-split-size.enabled     | Table default                                                  | Enables adaptive split sizing for read operations. When enabled, split size is automatically adjusted based on scan size and parallelism |
-| spark.sql.iceberg.read.adaptive-split-size.parallelism | max(spark.default.parallelism, spark.sql.shuffle.partitions)                                    | Overrides the parallelism used for adaptive split sizing. Must be greater than 0                                                |
 | spark.sql.iceberg.async-micro-batch-planning-enabled   | false                                                          | Enables asynchronous microbatch planning to reduce planning latency by pre-fetching file scan tasks                             |
 
 ### Read options
@@ -269,7 +266,6 @@ df.writeTo("catalog.db.table")
 | delete-granularity | file | Override this table's delete granularity for this write |
 | shred-variants | false | Overrides this table's write.parquet.shred-variants for this write |
 | variant-inference-buffer-size | 100 | Overrides this table's write.parquet.variant-inference-buffer-size for this write |
-| use-merge-append-for-streaming | false | Use a merge append instead of a fast append for streaming appends, so manifests are merged on commit rather than accumulating as small manifests |
 
 CommitMetadata provides an interface to add custom metadata to a snapshot summary during a SQL execution, which can be beneficial for purposes such as auditing or change tracking. If properties start with `snapshot-property.`, then that prefix will be removed from each property. Here is an example:
 

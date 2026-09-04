@@ -1,4 +1,3 @@
-#!/usr/bin/env sh
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -17,19 +16,4 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-
-set -eu
-
-CLASSPATH="iceberg-rest-adapter.jar"
-
-if [ -n "${LOG_CONFIG_DIR:-}" ]; then
-  CLASSPATH="${LOG_CONFIG_DIR}:${CLASSPATH}"
-fi
-
-set -- java
-
-if [ -n "${LOG_LEVEL:-}" ]; then
-  set -- "$@" "-Dorg.slf4j.simpleLogger.defaultLogLevel=${LOG_LEVEL}"
-fi
-
-exec "$@" -cp "$CLASSPATH" org.apache.iceberg.rest.RESTCatalogServer
+# Trivy ignore file for the Spark 3.5 runtime bundle.

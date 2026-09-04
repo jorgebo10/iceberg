@@ -349,8 +349,8 @@ Flink types are converted to Iceberg types according to the following table:
 | char                | string                     |               |
 | varchar             | string                     |               |
 | string              | string                     |               |
-| binary              | fixed                      |               |
-| varbinary           | binary                     |               |
+| binary              | binary                     |               |
+| varbinary           | fixed                      |               |
 | decimal             | decimal                    |               |
 | date                | date                       |               |
 | time                | time                       |               |
