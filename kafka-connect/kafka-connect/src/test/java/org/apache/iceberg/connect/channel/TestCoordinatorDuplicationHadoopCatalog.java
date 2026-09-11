@@ -128,7 +128,6 @@ public class TestCoordinatorDuplicationHadoopCatalog {
         when(config.connectGroupId()).thenReturn(CONNECT_CONSUMER_GROUP_ID);
         when(config.tableConfig(any())).thenReturn(mock(TableSinkConfig.class));
         when(config.commitTimeoutMs()).thenReturn(Integer.MAX_VALUE);
-        when(config.commitMaxConsecutiveFailures()).thenReturn(5);
 
         TopicPartitionInfo partitionInfo = mock(TopicPartitionInfo.class);
         when(partitionInfo.partition()).thenReturn(0);
