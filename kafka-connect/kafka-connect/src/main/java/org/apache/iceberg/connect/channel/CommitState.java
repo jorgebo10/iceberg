@@ -114,11 +114,13 @@ class CommitState {
       return false;
     }
 
-    int receivedPartitionCount =
+    long receivedPartitionCount =
         readyBuffer.stream()
             .filter(payload -> payload.commitId().equals(currentCommitId))
-            .mapToInt(payload -> payload.assignments().size())
-            .sum();
+            .flatMap(payload -> payload.assignments().stream())
+            .map(tpo -> tpo.topic() + ":" + tpo.partition())
+            .distinct()
+            .count();
 
     if (receivedPartitionCount >= expectedPartitionCount) {
       LOG.info(

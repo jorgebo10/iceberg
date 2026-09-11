@@ -123,7 +123,7 @@ abstract class Channel {
           record -> {
             // the consumer stores the offsets that corresponds to the next record to consume,
             // so increment the record offset by one
-            controlTopicOffsets.put(record.partition(), record.offset() + 1);
+            controlTopicOffsets.merge(record.partition(), record.offset() + 1, Long::max);
 
             Event event = AvroUtil.decode(record.value());
 
